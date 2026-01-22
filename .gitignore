@@ -1,0 +1,10 @@
+# Ignore local environments and build files
+venv/
+build/
+dist/
+__pycache__/
+*.spec
+
+# Ignore the heavy R engine and installers
+R-Portable/
+*.paf.exe
