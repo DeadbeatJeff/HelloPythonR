@@ -1,15 +1,17 @@
-# analysis.R
-# Fetch arguments passed from Python
+# compute_tolerances.R
+# 1. Re-enable arguments so R listens to Python
 args <- commandArgs(trailingOnly = TRUE)
+file_path <- args[1]
+col_name <- args[2]
 
-if (length(args) == 0) {
-  cat("Error: No data provided")
-  quit(status = 1)
+# 2. Add a check to see if the file actually exists in this context
+if(!file.exists(file_path)) {
+  stop(paste("File not found at:", file_path))
 }
 
-# Perform your PhD-level math here
-input_val <- as.numeric(args[1])
-result <- pnorm(input_val, mean = 0, sd = 1) # Standard Normal CDF
+library(readxl)
+data <- readxl::read_excel(file_path)
+values <- data[[col_name]]
+rss_result <- sqrt(sum(values^2, na.rm = TRUE))
 
-# 'cat' sends the result back to Python's stdout pipe
-cat(result)
+cat(round(rss_result, 4))
