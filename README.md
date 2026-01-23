@@ -1,5 +1,5 @@
 # HelloPythonR
-This Hello, World program demonstrates the possibility of running an R application with Python instead of R Shiny. It is just proof-of-concept currently. It reads in an MS Excel file, selects a column of tolerances data, and computes the RSS tolerances.
+This Hello, World program demonstrates the possibility of running an R application with Python instead of R Shiny. It is just proof-of-concept currently. It reads in an MS Excel file, selects a column of tolerances data, and computes the RSS tolerance.
 
 Quick Start: Download & Run
 If you are an engineer looking to use this tool, you do not need to install Python or R. The application is distributed as a self-contained Windows executable.
