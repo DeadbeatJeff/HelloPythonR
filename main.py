@@ -16,7 +16,7 @@ def get_resource_path(relative_path):
 
 # Use this to find your R engine
 r_engine = get_resource_path(os.path.join("R-Portable", "App", "R-Portable", "bin", "Rscript.exe"))
-r_script = get_resource_path("compute_tolerances.R")
+r_script = get_resource_path("die.R")
 
 def select_and_process_excel():
     # 1. Open File Dialog
@@ -75,17 +75,12 @@ def execute_r_task():
         # Build the command list with explicit quotes for spaces
         # result = [R_Executable, R_Script, Argument1, Argument2]
         result = subprocess.run(
-            [
-                f'"{r_engine}"', 
-                f'"{r_script}"'
-                # f'"{file_path}"', 
-                # f'"{column_name}"'
-            ],
-            capture_output=True, 
-            text=True, 
-            check=True,
-            shell=True # Required to handle the quotes on Windows
-        )
+    [r_engine, r_script],
+    capture_output=True, 
+    text=True, 
+    check=True,
+    shell=True # Required to handle the quotes on Windows
+)
         
         # Display the output from R
         app.after(0, lambda: output_label.configure(text=f"RSS Result: {result.stdout.strip()}"))
