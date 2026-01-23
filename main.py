@@ -28,12 +28,12 @@ def select_and_process_excel():
     
     # 1. Normalize the slashes to Windows standard
     # normalized_path = os.path.normpath(raw_path) # Automatically fixes slash direction
-    normalized_path = f"C:/Users/jeff/OneDrive - AirAd194/OneDrive/Documents/GitHub/ZB - Data/python/HelloPythonR/Tolerances.xlsx"
+    # normalized_path = f"C:/Users/jeff/OneDrive - AirAd194/OneDrive/Documents/GitHub/ZB - Data/python/HelloPythonR/Tolerances.xlsx"
 
     # 2. Add literal double quotes for shell safety
     # file_path = f'"{normalized_path}"'
-    # file_path = normalized_path
-    file_path = os.path.normpath(f"C:/Users/jeff/OneDrive - AirAd194/OneDrive/Documents/GitHub/ZB - Data/python/HelloPythonR/Tolerances.xlsx")
+    file_path = get_resource_path(raw_path)
+    # file_path = get_resource_path(f"C:/Users/jeff/OneDrive - AirAd194/OneDrive/Documents/GitHub/ZB - Data/python/HelloPythonR/Tolerances.xlsx")
 
     # 2. Read Excel headers to let user choose a column
     # df = pd.read_excel(file_path, nrows=0) 
@@ -46,10 +46,10 @@ def select_and_process_excel():
     
     # 4. Pass the file path and column name to R
     # run_r_analysis(file_path, column_name)
-    run_r_analysis()
+    run_r_analysis(file_path, column_name)
 
 # def run_r_analysis(file_path, column_name):
-def run_r_analysis():
+def run_r_analysis(file_path, column_name):
     # # 1. Grab the latest values from the UI
     # current_file = browse_btn.get()
     # current_col = column_dropdown.get()
@@ -60,14 +60,14 @@ def run_r_analysis():
 
     # 2. Pass them BOTH into the background thread
     thread = threading.Thread(
-        # target=execute_r_task, 
-        # args=(file_path, column_name)
-        target=execute_r_task
+        target=execute_r_task, 
+        args=(file_path, column_name)
+        # target=execute_r_task
     )
     thread.start()
 
 # def execute_r_task(file_path, column_name):
-def execute_r_task():
+def execute_r_task(file_path, column_name):
     try:
         # Normalize slashes for Windows
         # clean_path = os.path.normpath(file_path)
@@ -75,7 +75,7 @@ def execute_r_task():
         # Build the command list with explicit quotes for spaces
         # result = [R_Executable, R_Script, Argument1, Argument2]
         result = subprocess.run(
-    [r_engine, r_script],
+    [r_engine, r_script,file_path, column_name],
     capture_output=True, 
     text=True, 
     check=True,
