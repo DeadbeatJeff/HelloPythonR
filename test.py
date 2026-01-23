@@ -18,19 +18,19 @@ r_script = get_resource_path("compute_tolerances.R")
 print(r_engine)
 print(r_script)
 
-# def run_stats():
-#     # user_input = "Junk"
+def run_stats():
+    # user_input = "Junk"
     
-#     # Call Rscript.exe and pass the user input as an argument
-#         # Shell=True is often needed on Windows to find Rscript in PATH
-#     result = subprocess.run(
-#         [f'"r_engine"', f'"r_script"'], # Interpreter first, then script, then input
-#         capture_output=True, 
-#         text=True, 
-#         check=True,
-#         shell=True # Necessary to process the internal quotes
-#         )        
-#     print(result.stdout.strip())
+    # Call Rscript.exe and pass the user input as an argument
+        # Shell=True is often needed on Windows to find Rscript in PATH
+    result = subprocess.run(
+        [f'"{r_engine}"', f'"{r_script}"'], # Interpreter first, then script, then input
+        capture_output=True, 
+        text=True, 
+        check=True,
+        shell=True # Necessary to process the internal quotes
+        )        
+    print(result.stdout.strip())
         
 
-# run_stats()
+run_stats()
