@@ -1,9 +1,5 @@
 # compute_tolerances.R
 
-# You may need to ensure 'readxl' is in your R-Portable library
-# if (!require("readxl", quietly = TRUE)) {
-#   install.packages("readxl", repos = "https://cran.rstudio.com/")
-# }
 library(readxl)
 
 args <- commandArgs(trailingOnly = TRUE)
@@ -19,4 +15,4 @@ values <- data[[col_name]]
 # Perform Actuarial/Statistical Analysis (e.g., RSS of the column)
 result <- sqrt(sum(values^2, na.rm = TRUE))
 
-cat(paste("Analysis Complete. Column RSS:", round(result, 4)))
+cat(paste(round(result, 3)))

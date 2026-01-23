@@ -16,64 +16,61 @@ def get_resource_path(relative_path):
 
 # Use this to find your R engine
 r_engine = get_resource_path(os.path.join("R-Portable", "App", "R-Portable", "bin", "Rscript.exe"))
-r_script = get_resource_path("die.R")
+r_script = get_resource_path("compute_tolerances.R")
 
 def select_and_process_excel():
     # 1. Open File Dialog
     raw_path = filedialog.askopenfilename(
         filetypes=[("Excel files", "*.xlsx *.xls")]
     )
-    if not raw_path:
+    
+    if raw_path:
+        # 2. Process it (e.g., using get_resource_path)
+        file_path = get_resource_path(raw_path)
+        
+        # 3. Physically put it in the Entry widget
+        entry.delete(0, "end")      # Clear previous text
+        entry.insert(0, file_path)  # Now entry.get() will return THIS string
+
+    # 3. Use pandas to read only the header row
+    try:
+        df = pd.read_excel(file_path, nrows=0)
+        headers = df.columns.tolist()
+        
+        # Update the dropdown with the actual Excel headers
+        column_dropdown.configure(values=headers)
+        column_dropdown.set(headers[0]) # Default to the first column
+    except Exception as e:
+        messagebox.showerror("File Error", f"Could not read headers: {e}")
+
+    # 4. GET THE COLUMN NAME FROM THE DROPDOWN
+    column_name = column_dropdown.get()
+    
+    # 5. Validation: Don't run if no column is selected
+    if column_name == "None Detected":
+        messagebox.showwarning("Selection Required", "Please select a data column first.")
+
+def run_r_analysis():
+    # 1. Grab the latest values from the entry box and dropdown
+    file_path = entry.get()
+    column_name = column_dropdown.get()
+
+    # 2. Validation: Ensure we don't send "None Detected" to R
+    if (not file_path) or (column_name == "None Detected"):
+        messagebox.showwarning("Input Error", "Please select a file and a data column.")
         return
-    
-    # 1. Normalize the slashes to Windows standard
-    # normalized_path = os.path.normpath(raw_path) # Automatically fixes slash direction
-    # normalized_path = f"C:/Users/jeff/OneDrive - AirAd194/OneDrive/Documents/GitHub/ZB - Data/python/HelloPythonR/Tolerances.xlsx"
 
-    # 2. Add literal double quotes for shell safety
-    # file_path = f'"{normalized_path}"'
-    file_path = get_resource_path(raw_path)
-    # file_path = get_resource_path(f"C:/Users/jeff/OneDrive - AirAd194/OneDrive/Documents/GitHub/ZB - Data/python/HelloPythonR/Tolerances.xlsx")
-
-    # 2. Read Excel headers to let user choose a column
-    # df = pd.read_excel(file_path, nrows=0) 
-    df = pd.read_excel(file_path, nrows=0) 
-    columns = df.columns.tolist()
-    
-    # 3. Create a simple popup to pick the column (simplified for now)
-    # For this demo, let's assume we take the first column or a specific name
-    column_name = columns[0] 
-    
-    # 4. Pass the file path and column name to R
-    # run_r_analysis(file_path, column_name)
-    run_r_analysis(file_path, column_name)
-
-# def run_r_analysis(file_path, column_name):
-def run_r_analysis(file_path, column_name):
-    # # 1. Grab the latest values from the UI
-    # current_file = browse_btn.get()
-    # current_col = column_dropdown.get()
-
-    # if not current_file or current_col == "None Detected":
-    #     messagebox.showwarning("Input Error", "Please select a file and a data column.")
-    #     return
-
-    # 2. Pass them BOTH into the background thread
+    # 3. Pass BOTH into the background thread as args
     thread = threading.Thread(
         target=execute_r_task, 
         args=(file_path, column_name)
-        # target=execute_r_task
     )
     thread.start()
 
 # def execute_r_task(file_path, column_name):
 def execute_r_task(file_path, column_name):
     try:
-        # Normalize slashes for Windows
-        # clean_path = os.path.normpath(file_path)
-        
-        # Build the command list with explicit quotes for spaces
-        # result = [R_Executable, R_Script, Argument1, Argument2]
+        # Run the R script
         result = subprocess.run(
     [r_engine, r_script,file_path, column_name],
     capture_output=True, 
@@ -83,7 +80,7 @@ def execute_r_task(file_path, column_name):
 )
         
         # Display the output from R
-        app.after(0, lambda: output_label.configure(text=f"RSS Result: {result.stdout.strip()}"))
+        app.after(0, lambda: output_label.configure(text=f"RSS Tolerance: {result.stdout.strip()}"))
 
     except subprocess.CalledProcessError as e:
         error_info = e.stderr if e.stderr else e.stdout
@@ -92,7 +89,7 @@ def execute_r_task(file_path, column_name):
 # --- UI Setup ---
 ctk.set_appearance_mode("dark")
 app = ctk.CTk()
-app.geometry("400x320")
+app.geometry("1000x360")
 app.title("GE HealthCare - CT Bay Analytics")
 
 # UI Layout
@@ -102,25 +99,24 @@ label.pack(pady=(20, 5))
 sub_label = ctk.CTkLabel(app, text="Select Tolerance Excel File:")
 sub_label.pack(pady=5)
 
-entry = ctk.CTkEntry(app, placeholder_text="Select a file...", width=400)
+entry = ctk.CTkEntry(app, placeholder_text="Select a file...", width=800)
 entry.pack(pady=5)
 
 # Button to trigger the file dialog
-# browse_btn = ctk.CTkButton(app, text="Browse Files", command=select_file, fg_color="gray")
 browse_btn = ctk.CTkButton(app, text="Browse Files", command=select_and_process_excel)
 browse_btn.pack(pady=5)
 
-# # Add this in your UI Setup section
-# column_label = ctk.CTkLabel(app, text="Select Data Column:")
-# column_label.pack(pady=(10, 0))
+# Add this in your UI Setup section
+column_label = ctk.CTkLabel(app, text="Select Data Column:")
+column_label.pack(pady=(10, 0))
 
-# # Initialize with a dummy value
-# column_dropdown = ctk.CTkOptionMenu(app, values=["None Detected"], width=200)
-# column_dropdown.pack(pady=5)
+# Initialize with a dummy value
+column_dropdown = ctk.CTkOptionMenu(app, values=["None Detected"], width=200)
+column_dropdown.pack(pady=5)
 
 # Primary action button
-# calculate_button = ctk.CTkButton(app, text="Calculate RSS Tolerance", command=run_r_analysis)
-# calculate_button.pack(pady=20)
+calculate_button = ctk.CTkButton(app, text="Calculate RSS Tolerance", command=run_r_analysis)
+calculate_button.pack(pady=20)
 
 output_label = ctk.CTkLabel(app, text="RSS Statistical Tolerance will be shown here.")
 output_label.pack(pady=10)
