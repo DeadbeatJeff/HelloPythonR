@@ -1,8 +1,8 @@
 # compute_tolerances.R
 # 1. Re-enable arguments so R listens to Python
-args <- commandArgs(trailingOnly = TRUE)
-file_path <- args[1]
-col_name <- args[2]
+# args <- commandArgs(trailingOnly = TRUE)
+file_path <- "C:\\Users\\jeff\\OneDrive - AirAd194\\OneDrive\\Documents\\GitHub\\ZB - Data\\python\\HelloPythonR\\Tolerances.xlsx"
+col_name <- "Tolerances"
 
 # 2. Add a check to see if the file actually exists in this context
 if(!file.exists(file_path)) {
