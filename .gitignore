@@ -8,3 +8,4 @@ __pycache__/
 # Ignore the heavy R engine and installers
 R-Portable/
 *.paf.exe
+.Rproj.user
