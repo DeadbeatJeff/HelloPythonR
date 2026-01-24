@@ -1,5 +1,20 @@
 # compute_tolerances.R
 
+# Define required packages
+required_packages <- c("readxl")
+
+# Set a reliable CRAN mirror to avoid a popup selection window
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+
+# Self-healing library check
+for (pkg in required_packages) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    # type="binary" ensures it doesn't try to compile from source
+    # dependencies=TRUE ensures all sub-libraries like 'cellranger' are included
+    install.packages(pkg, type = "binary", dependencies = TRUE)
+  }
+}
+
 library(readxl)
 
 args <- commandArgs(trailingOnly = TRUE)
